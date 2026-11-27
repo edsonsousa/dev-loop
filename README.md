@@ -32,6 +32,33 @@ What keeps it honest:
 - **A safe machine.** Every heavy command runs through `heavy.sh`: a time limit everywhere and, on Linux, one at a
   time, only with free memory, under a systemd memory cap.
 
+## How it compares
+
+dev-loop runs one well-defined task and checks the result. Skill libraries teach the agent how to work across the
+whole cycle. Review plugins judge a diff that already exists. They overlap less than it seems.
+
+| | dev-loop | [Superpowers](https://github.com/obra/superpowers) subagent-driven development | [Ralph loop](https://claude.com/plugins/ralph-loop) | Review plugins ([Code Review](https://claude.com/plugins/code-review), [cc-review](https://github.com/rhuss/cc-review), …) |
+| --- | --- | --- | --- | --- |
+| Scope | one task, from brief to approved diff | the whole cycle: brainstorm, plan, implement, review, finish | one prompt, repeated | review of a diff or PR |
+| Who judges | reviewer, critic and security in parallel; refiner on another model | one task reviewer (spec, then quality), a final branch review | the same agent | several reviewers in parallel |
+| Checks beyond prompts | gate, `weakening.sh`, Semgrep, gitleaks, mutation | helper scripts for briefs, diffs and the ledger; tests reported by the implementer | a completion promise | varies |
+| When stuck | round limit, then a person, with proposed slices | five-round breaker; the controller records a ruling and goes on | max iterations | fix rounds, where offered |
+| Afterwards | history, quality per loop version, cost, live UI | a ledger, deleted after the final review | nothing | review comments |
+| Runs on | Claude Code (full resource guard on Linux) | 16 agent harnesses | Claude Code | Claude Code, some also Codex and OpenCode |
+
+What dev-loop gives up:
+
+- **Cost and time.** Four to six agents a round, two on Opus. For a small change it is too much.
+- **No help before the task.** It does not brainstorm, plan or debug: it expects a task with acceptance criteria.
+- **More moving parts.** Bash scripts, Python, a `.claude/dev-loop.yml` and a CLAUDE.md per project; a skill is
+  only markdown.
+- **Young.** One author, a few projects, against libraries with a large community.
+
+They combine well: plan with Superpowers' brainstorming and writing-plans skills (or your own), then run each task
+of the plan with `/dev-loop:run`.
+
+Compared as of November 2026 (Superpowers 7.0.2); check each project for its current state.
+
 ## Requirements
 
 - Claude Code with plugin support
