@@ -1,0 +1,5 @@
+{
+  "name": "dev-loop",
+  "owner": { "name": "Edson Sousa" },
+  "plugins": [{ "name": "dev-loop", "source": "./plugin", "description": "Agent loop for development tasks with history and dashboard" }]
+}

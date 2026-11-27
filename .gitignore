@@ -1,0 +1,4 @@
+__pycache__/
+*.db
+plugin/.claude-plugin/types/
+plugin/tsconfig.json
