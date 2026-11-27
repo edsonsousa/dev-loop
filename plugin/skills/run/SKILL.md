@@ -13,7 +13,7 @@ write production code yourself: you plan, dispatch, run the gate, read verdicts 
 Task: $ARGUMENTS
 
 Plugin folder: `${CLAUDE_PLUGIN_ROOT}` (if that text was not replaced by a path, find the folder with
-`claude plugin list` under `dev-loop`). The history tools are in its sibling `hub/`.
+`claude plugin list` under `dev-loop`). The history tools are in its `hub/`.
 
 ## Project settings
 
@@ -44,7 +44,7 @@ any paths it says need human review). Do not guess the gate.
 - Only blocking findings keep the loop going. Nits go into the final summary.
 - Never commit, push, merge, or approve anything on the user's behalf.
 - Every gate, mutation and test command, yours or an agent's, runs as
-  `${CLAUDE_PLUGIN_ROOT}/skills/run/heavy.sh '<command>'` (HEAVY below): one at a time on the machine, when memory
+  `${CLAUDE_PLUGIN_ROOT}/skills/run/heavy.sh '<command>'` (HEAVY below): where the platform allows, one at a time on the machine, when memory
   allows, under a memory cap. Its exit 75 (busy or low memory) and 137 (killed at the cap) are not test results:
   wait a minute and run it again once; a second time, escalate with that reason. Never send them to a gate fix.
   Exit 124 means the command ran past `timeoutMinutes` and was killed with everything it started. The change may
@@ -56,7 +56,7 @@ any paths it says need human review). Do not guess the gate.
 
 Every subagent call runs in the background. Right after the calls of a step (the implementer, a gate fix, the
 round's reviewers, the refiner), arm a `Monitor` with timeout 1800000 and the command
-`python3 ${CLAUDE_PLUGIN_ROOT}/../hub/watch.py --cwd <repo root> --task <task-slug> --round <N>`. Re-arm it when
+`python3 ${CLAUDE_PLUGIN_ROOT}/hub/watch.py --cwd <repo root> --task <task-slug> --round <N>`. Re-arm it when
 it expires while those agents still run. Each line it prints is one agent in trouble:
 `{"agent", "role", "round", "kind", "detail", "at"}`, with kind `stalled`, `looping`, `tool_calls`, `compacted` or
 `budget`. `{"kind": "no-agents"}` means it found none of the step's agents: check the `description` tags.
@@ -211,7 +211,7 @@ Then record the run, approved or escalated alike:
    with an id `<role letter><round>-n<k>`. `mutation` is the last mutation run (its overall score and the survivors
    on changed lines), `scan` the last scan, `weakening` every line `weakening.sh` reported in the run; leave out
    the ones that did not run. `split` is `after` when the report proposed slices, otherwise `none`.
-3. `python3 ${CLAUDE_PLUGIN_ROOT}/../hub/ingest.py` to add it to the history. If it fails, show the error and go
+3. `python3 ${CLAUDE_PLUGIN_ROOT}/hub/ingest.py` to add it to the history. If it fails, show the error and go
    on: the run file is enough to ingest later.
 
 Do not commit. Offer to, in one line.

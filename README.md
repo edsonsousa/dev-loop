@@ -9,7 +9,7 @@ UI shows the agents live, the history and whether a change to the loop made it b
 
 ## How it works
 
-![The loop: implementer, gate, scan, reviewer, critic and security in parallel, refiner, until all approve](docs/img/loop.png)
+![The loop: implementer, gate, scan, reviewer, critic and security in parallel, refiner, until all approve](docs/img/loop.svg)
 
 | Role | Agent | Model | Job |
 | --- | --- | --- | --- |
@@ -29,13 +29,14 @@ What keeps it honest:
   Stryker survivors on changed lines go to the reviewer as test gaps.
 - **A round limit.** After 3 rounds (configurable), or when the judges are stuck, it escalates to a person and
   proposes vertical slices to run separately.
-- **A safe machine.** Every heavy command runs through `heavy.sh`: one at a time, only with free memory, under a
-  systemd memory cap and a time limit.
+- **A safe machine.** Every heavy command runs through `heavy.sh`: a time limit everywhere and, on Linux, one at a
+  time, only with free memory, under a systemd memory cap.
 
 ## Requirements
 
 - Claude Code with plugin support
-- Linux with systemd (for `heavy.sh`'s memory cap and `/proc/pressure`) and Python 3 (the UI uses the standard library only)
+- Bash and Python 3 on the PATH as `python3` (standard library only). Linux, macOS and Windows (Claude Code runs
+  its commands in Git Bash there) all work; see [Machine resources](#machine-resources) for what each one gets.
 - Optional: [Semgrep](https://semgrep.dev) and [gitleaks](https://github.com/gitleaks/gitleaks) for the scan,
   [Stryker](https://stryker-mutator.io) for mutation testing, [Datasette](https://datasette.io) for ad-hoc SQL
 
@@ -47,11 +48,12 @@ claude plugin install dev-loop@dev-loop
 pipx install semgrep            # optional static scan; gitleaks: a release binary on your PATH
 ```
 
-The UI lives in `hub/`, outside the plugin, so clone the repository to run it:
+The UI ships inside the plugin, in `hub/`. Run it from a clone, or from the installed plugin's folder (its path is
+in `~/.claude/plugins/`):
 
 ```bash
 git clone https://github.com/edsonsousa/dev-loop.git && cd dev-loop
-hub/serve.sh                    # http://127.0.0.1:8766
+plugin/hub/serve.sh             # http://127.0.0.1:8766; on Windows: python plugin/hub/app.py
 ```
 
 To work on the plugin itself, add the clone as the marketplace instead (`claude plugin marketplace add ./dev-loop`)
@@ -103,10 +105,6 @@ watch:                                # optional; the watchdog stops an agent pa
   maxUsd: 5
 ```
 
-Every gate, mutation and test command, the orchestrator's and the agents', runs through
-`plugin/skills/run/heavy.sh`. It runs one at a time on the machine, starts only with enough free memory, and runs
-under a systemd memory cap, so a runaway build is killed instead of freezing the desktop. Also cap the tools' own
-parallelism in the gate lines, for example `--maxWorkers=2` for Vitest and `--concurrency 2` for Stryker.
 
 2. Keep the loop's logs out of git: `.claude/dev-loop/` in `.gitignore` (or `.claude/*` with
    `!.claude/dev-loop.yml`).
@@ -116,35 +114,52 @@ Per task the loop writes `.claude/dev-loop/<task>.md` (readable log), `<task>.ru
 loads) and a git ref `refs/dev-loop/<task>` with the code as the loop left it, so the history can compare it with
 what reached main. Remove those refs with `git for-each-ref --format='%(refname)' refs/dev-loop | xargs -n1 git update-ref -d`.
 
+### Machine resources
+
+Every gate, mutation and test command, the orchestrator's and the agents', runs through
+`plugin/skills/run/heavy.sh`, so parallel agents and sessions cannot freeze the machine. What it can enforce depends
+on the platform:
+
+| | Time limit (`timeoutMinutes`) | One at a time | Waits for free memory | Memory cap |
+| --- | --- | --- | --- | --- |
+| Linux with systemd | yes | yes (`flock`) | yes (`/proc`) | yes (user scope) |
+| Linux without systemd | yes | yes | yes | no |
+| macOS | with `gtimeout` (`brew install coreutils`) | no | no | no |
+| Windows (Git Bash) | yes | no | no | no |
+
+`DEV_LOOP_NO_LIMITS=1` turns everything but the time limit off on any platform. Where the queue and the cap are
+missing, cap the tools' own parallelism in the gate lines, for example `--maxWorkers=2` for Vitest and
+`--concurrency 2` for Stryker.
+
 ## UI
 
-The UI is in Portuguese. One page, four tabs; every run and agent links to its detail.
+One page, four tabs; every run and agent links to its detail.
 
-- **Ao vivo** (live, above): every dev-loop task of the last 12 hours in any session. For each task, the
+- **Live** (above): every dev-loop task of the last 12 hours in any session. For each task, the
   orchestrator's last action, a timeline of its agents, and per agent: status, verdict, time, tool calls, context
   against 300k, cost, and the tool it is running now. It updates by itself (server-sent events).
-- **Tarefas** (runs): the recorded runs, with filters by project, date and loop version. Each run's detail has a
+- **Runs**: the recorded runs, with filters by project, date and loop version. Each run's detail has a
   timeline, cost per role, gates, blocking findings with evidence, nits, agents, and what changed on main afterwards.
 
   ![The runs tab: cost per task and the list of recorded runs](docs/img/ui-runs.png)
 
-- **Qualidade** (quality): indicators per loop version or per week: first-round approval, rounds, escalations,
+- **Quality**: indicators per loop version or per week: first-round approval, rounds, escalations,
   escapes, blocking and duplicates, nits, gate first pass, mutation score, weakening, cost per approved run,
   minutes. Deltas show only between groups of 3 runs or more. Name a version there to mark an experiment.
 
   ![The quality tab: indicators of the latest loop version against the previous one](docs/img/ui-quality.png)
 
-- **Agentes** (agents): peak context, minutes and cost of every agent.
+- **Agents**: peak context, minutes and cost of every agent.
 
-The screenshots use example data (`python3 hub/test_app.py --serve 8798`).
+The screenshots use example data (`python3 plugin/hub/test_app.py --serve 8798`).
 
 ![Where the data comes from: the plugin's run records, git refs and transcripts, ingested into SQLite](docs/img/architecture.png)
 
 ```bash
-hub/serve.sh                 # the UI on http://127.0.0.1:8766 (PORT=... to change); keeps the history up to date
-hub/serve.sh sql             # the database in Datasette on :8767, for ad-hoc SQL (pipx install datasette)
-python3 hub/ingest.py        # ingest only; /dev-loop:run does this at the end of every task
-python3 hub/test_app.py --serve 8798   # the UI on fixture data: two loop versions, three runs each
+plugin/hub/serve.sh              # the UI on http://127.0.0.1:8766 (PORT=... to change); keeps the history up to date
+plugin/hub/serve.sh sql          # the database in Datasette on :8767, for ad-hoc SQL (pipx install datasette)
+python3 plugin/hub/ingest.py     # ingest only; /dev-loop:run does this at the end of every task
+python3 plugin/hub/test_app.py --serve 8798   # the UI on fixture data: two loop versions, three runs each
 ```
 
 The loop version is a hash of the plugin's agents, skills and scripts (`plugin/skills/run/version.sh`), so a
@@ -158,21 +173,21 @@ the database. Costs are estimates from the `price` table in `schema.sql`; edit i
 ## Development
 
 ```bash
-python3 hub/test_ingest.py && python3 hub/test_app.py
+python3 plugin/hub/test_ingest.py && python3 plugin/hub/test_app.py
 plugin/skills/run/test_weakening.sh && plugin/skills/run/test_heavy.sh
 ```
 
 Layout:
 
 - `plugin/`: the Claude Code plugin: `skills/run` (the orchestrator and its scripts), `skills/retro`, `agents/`
-  (implementer, reviewer, critic, refiner, each compacting at 300k tokens) and `hooks/` (the live pane)
-- `hub/`: `ingest.py` loads run records, agent transcripts and git into `~/.local/share/dev-loop/history.db`;
+  (implementer, reviewer, critic, refiner, each compacting at 300k tokens), `hooks/` (the live pane) and `hub/`
+- `plugin/hub/`: `ingest.py` loads run records, agent transcripts and git into `~/.local/share/dev-loop/history.db`;
   `app.py` serves the UI; `live.py` reads the transcripts as they grow; `watch.py` is the watchdog;
   `schema.sql`, `views.sql`, `static/`
-- `docs/img/`: the images of this README; the diagrams are Mermaid sources (`*.mmd`), rendered with
-  `mmdc -i loop.mmd -o loop.png -s 2 -b white`
+- `docs/img/`: the images of this README. `loop.svg` is edited by hand; `architecture.png` is rendered from
+  `architecture.mmd` with `mmdc -i architecture.mmd -o architecture.png -s 2 -b "#f9f9f9"`
 
 ## License
 
-[MIT](LICENSE). `hub/static/vendor/` holds Vega 6.4, Vega-Lite 6.5 and Vega-Embed 7.4 under BSD-3-Clause, so the UI
+[MIT](LICENSE). `plugin/hub/static/vendor/` holds Vega 6.4, Vega-Lite 6.5 and Vega-Embed 7.4 under BSD-3-Clause, so the UI
 works offline.

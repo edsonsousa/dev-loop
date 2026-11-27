@@ -30,6 +30,11 @@ out="$(DEV_LOOP_TIMEOUT_SECONDS=1 "$h" 'sleep 1 & sleep 30; echo late' 2>&1)"; r
 out="$(DEV_LOOP_TIMEOUT_SECONDS=1 "$h" 'trap "" TERM; sleep 40' 2>&1)"; rc=$?
 [ "$rc" = 124 ] || fail "a command ignoring TERM should still end as 124: $rc $out"
 
+out="$(DEV_LOOP_NO_LIMITS=1 "$h" 'echo plain; exit 4')"; rc=$?
+[ "$rc" = 4 ] && [ "$out" = plain ] || fail "without limits the exit code or output was lost: $rc $out"
+out="$(DEV_LOOP_NO_LIMITS=1 DEV_LOOP_TIMEOUT_SECONDS=1 "$h" 'sleep 30' 2>&1)"; rc=$?
+[ "$rc" = 124 ] || fail "without limits the time limit should still give 124: $rc $out"
+
 if systemd-run --user --scope -q true 2>/dev/null; then
   out="$(DEV_LOOP_MAX_GB=0.05 "$h" "python3 -c 'b = bytearray(300 * 2**20)'" 2>&1)"; rc=$?
   [ "$rc" = 137 ] && [[ "$out" == *cap* ]] || fail "the memory cap should kill with 137: $rc $out"

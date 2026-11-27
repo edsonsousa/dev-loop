@@ -11,18 +11,30 @@
 # 124 when it ran past the time limit.
 # Settings: `resources:` in .claude/dev-loop.yml (minFreeGb, maxGb, waitMinutes, timeoutMinutes); DEV_LOOP_*
 # variables win.
+# Portable: the queue and the memory check need Linux (/proc, flock), the cap needs systemd. Elsewhere (macOS,
+# Windows Git Bash) or with DEV_LOOP_NO_LIMITS=1 it only applies the time limit, when `timeout` or `gtimeout` exists.
 set -uo pipefail
 if [ -n "${DEV_LOOP_HEAVY:-}" ]; then exec bash -c "$*"; fi  # inside heavy.sh already: the lock is held
 
 conf="$(git rev-parse --show-toplevel 2>/dev/null)/.claude/dev-loop.yml"
 setting() { sed -n "s/^ *$1: *\([0-9.]*\).*/\1/p" "$conf" 2>/dev/null | head -1; }
+timeout_min=$(setting timeoutMinutes)
+timeout_s=${DEV_LOOP_TIMEOUT_SECONDS:-$(awk "BEGIN { print int(${timeout_min:-20} * 60) }")}
+
+if [ -n "${DEV_LOOP_NO_LIMITS:-}" ] || [ ! -r /proc/meminfo ] || ! command -v flock > /dev/null; then
+  export DEV_LOOP_HEAVY=1
+  t=$(command -v timeout || command -v gtimeout || true)
+  [ -n "$t" ] || exec bash -c "$*"
+  "$t" -k 10 "$timeout_s" bash -c "$*"; rc=$?
+  [ "$rc" = 124 ] && echo "dev-loop heavy: timed out after $timeout_s s" >&2
+  exit $rc
+fi
+
 total_gb=$(awk '/^MemTotal/ { print $2 / 1048576 }' /proc/meminfo)
 min_free=${DEV_LOOP_MIN_FREE_GB:-$(setting minFreeGb)}; min_free=${min_free:-4}
 max_gb=${DEV_LOOP_MAX_GB:-$(setting maxGb)}; max_gb=${max_gb:-$(awk "BEGIN { print int($total_gb * 0.6) }")}
 wait_min=$(setting waitMinutes)
 wait_s=${DEV_LOOP_WAIT_SECONDS:-$(awk "BEGIN { print int(${wait_min:-8} * 60) }")}
-timeout_min=$(setting timeoutMinutes)
-timeout_s=${DEV_LOOP_TIMEOUT_SECONDS:-$(awk "BEGIN { print int(${timeout_min:-20} * 60) }")}
 lock=${DEV_LOOP_LOCK:-$HOME/.cache/dev-loop/heavy.lock}
 mkdir -p "$(dirname "$lock")"
 deadline=$(( $(date +%s) + wait_s ))

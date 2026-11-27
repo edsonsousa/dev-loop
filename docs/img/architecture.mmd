@@ -1,3 +1,4 @@
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#ffffff", "primaryBorderColor": "#c2c2c2", "lineColor": "#555555", "fontFamily": "sans-serif", "clusterBkg": "#f1f6fd", "clusterBorder": "#257de0"}}}%%
 flowchart LR
   subgraph CC[Claude Code session]
     P[dev-loop plugin<br/>skills · agents · hooks]
@@ -5,11 +6,11 @@ flowchart LR
   P -- writes --> L[".claude/dev-loop/&lt;task&gt;.md<br/>&lt;task&gt;.run.json"]
   P -- snapshot --> REF[git ref<br/>refs/dev-loop/&lt;task&gt;]
   CC -- transcripts --> TR["~/.claude/projects/*.jsonl"]
-  L --> IN[hub/ingest.py]
+  L --> IN[plugin/hub/ingest.py]
   REF --> IN
   TR --> IN
   IN --> DB[(SQLite<br/>history.db)]
-  TR -- tailed live --> LV[hub/live.py]
-  DB --> APP[hub/app.py<br/>127.0.0.1:8766]
+  TR -- tailed live --> LV[plugin/hub/live.py]
+  DB --> APP[plugin/hub/app.py<br/>127.0.0.1:8766]
   LV -- server-sent events --> APP
-  APP --> UI[browser<br/>Ao vivo · Tarefas · Qualidade · Agentes]
+  APP --> UI[browser<br/>Live · Runs · Quality · Agents]

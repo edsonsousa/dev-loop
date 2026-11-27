@@ -3,4 +3,4 @@
 # The same files give the same version, with or without git.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
-find agents skills -type f \( -name '*.md' -o -name '*.sh' \) ! -name 'test_*' | LC_ALL=C sort | xargs cat | sha256sum | cut -c1-8
+find agents skills -type f \( -name '*.md' -o -name '*.sh' \) ! -name 'test_*' | LC_ALL=C sort | xargs cat | { command -v sha256sum > /dev/null && sha256sum || shasum -a 256; } | cut -c1-8

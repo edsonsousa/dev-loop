@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dev-loop</title>
+<link rel="stylesheet" href="/style.css">
+<script src="/vendor/vega.min.js"></script>
+<script src="/vendor/vega-lite.min.js"></script>
+<script src="/vendor/vega-embed.min.js"></script>
+</head>
+<body>
+<header>
+  <a class="brand" href="#/live">dev-loop</a>
+  <nav>
+    <a href="#/live" data-tab="live">Live <span id="live-count" class="pill" hidden></span></a>
+    <a href="#/runs" data-tab="runs">Runs</a>
+    <a href="#/quality" data-tab="quality">Quality</a>
+    <a href="#/agents" data-tab="agents">Agents</a>
+  </nav>
+  <form id="filters">
+    <label>Project <select name="project"><option value="">all</option></select></label>
+    <label>Since <input type="date" name="since"></label>
+    <label>Version <select name="version"><option value="">all</option></select></label>
+  </form>
+  <span id="stream" class="stream" title="Live connection">●</span>
+</header>
+<main id="view"></main>
+<script src="/app.js"></script>
+</body>
+</html>

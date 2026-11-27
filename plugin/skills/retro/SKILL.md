@@ -14,9 +14,9 @@ Scope: $ARGUMENTS
 
 ## Data
 
-1. Refresh the history: `python3 ${CLAUDE_PLUGIN_ROOT}/../hub/ingest.py` (if `${CLAUDE_PLUGIN_ROOT}` was not replaced
+1. Refresh the history: `python3 ${CLAUDE_PLUGIN_ROOT}/hub/ingest.py` (if `${CLAUDE_PLUGIN_ROOT}` was not replaced
    by a path, find the plugin folder with `claude plugin list`).
-2. Query `~/.local/share/dev-loop/history.db` with `sqlite3` or `python3 -c`. Its schema is in `hub/schema.sql`;
+2. Query `~/.local/share/dev-loop/history.db` with `sqlite3` or `python3 -c`. Its schema is in `${CLAUDE_PLUGIN_ROOT}/hub/schema.sql`;
    start from the views `run_summary`, `role_value` and `agent_cost`, and the tables `finding`, `gate_run`,
    `post_merge`. Filter by `project.name` unless the scope says all projects.
 3. Read a run's `.claude/dev-loop/<task>.md` or an agent transcript only to check a specific finding.
@@ -51,7 +51,7 @@ Write `.claude/dev-loop/retro-<YYYY-MM-DD>.md` and show the user a short version
 - At most five proposals, each with its evidence and the exact change (agent file and lines, `.claude/dev-loop.yml`
   value, rule for CLAUDE.md). Rank by expected effect. No proposal without evidence from at least two runs, or one
   serious miss.
-- Where to look: `${CLAUDE_PLUGIN_ROOT}/../hub/serve.sh` opens the dashboard.
+- Where to look: `${CLAUDE_PLUGIN_ROOT}/hub/serve.sh` opens the dashboard.
 
 With fewer than three runs, say the data is too thin for changes and report only what was seen.
 Agents and skills live in the plugin folder, shared by every project: a change there changes every project, so say

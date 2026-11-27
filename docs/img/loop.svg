@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 580" width="1400" height="580" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/></marker>
+<style>.t{font-size:15px;font-weight:600;fill:#191919;text-anchor:middle} .s{font-size:12px;fill:#666;text-anchor:middle} .l{font-size:12px;fill:#555} .h{font-size:20px;font-weight:700;fill:#191919}</style></defs>
+<rect width="1400" height="580" rx="16" fill="#f9f9f9"/>
+<rect x="28" y="240" width="86" height="50" rx="25" fill="#191919"/><text x="71" y="270" class="t" style="fill:#fff">task</text>
+<rect x="144" y="225" width="150" height="80" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="144" y="235" width="5" height="60" rx="2.5" fill="#191919"/>
+<text x="221.0" y="253.0" class="t">Orchestrator</text>
+<text x="221.0" y="272.0" class="s">/dev-loop:run</text>
+<text x="221.0" y="288.0" class="s">writes the brief</text>
+<rect x="324" y="225" width="150" height="80" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="324" y="235" width="5" height="60" rx="2.5" fill="#257de0"/>
+<text x="401.0" y="253.0" class="t">Implementer</text>
+<text x="401.0" y="272.0" class="s">Opus · TDD</text>
+<text x="401.0" y="288.0" class="s">maps criteria → tests</text>
+<rect x="504" y="225" width="160" height="80" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="504" y="235" width="5" height="60" rx="2.5" fill="#008a17"/>
+<text x="586.0" y="253.0" class="t">Gate</text>
+<text x="586.0" y="272.0" class="s">tests · lint · build</text>
+<text x="586.0" y="288.0" class="s">weakening.sh</text>
+<rect x="694" y="225" width="160" height="80" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="694" y="235" width="5" height="60" rx="2.5" fill="#9c9c9c"/>
+<text x="776.0" y="253.0" class="t">Scan</text>
+<text x="776.0" y="272.0" class="s">Semgrep · gitleaks</text>
+<text x="776.0" y="288.0" class="s">mutation (optional)</text>
+<rect x="904" y="135" width="170" height="70" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="904" y="145" width="5" height="50" rx="2.5" fill="#f47230"/>
+<text x="991.0" y="166.0" class="t">Reviewer</text>
+<text x="991.0" y="185.0" class="s">Opus · correctness</text>
+<rect x="904" y="230" width="170" height="70" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="904" y="240" width="5" height="50" rx="2.5" fill="#00b894"/>
+<text x="991.0" y="261.0" class="t">Critic</text>
+<text x="991.0" y="280.0" class="s">Sonnet · design, risk</text>
+<rect x="904" y="325" width="170" height="70" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="904" y="335" width="5" height="50" rx="2.5" fill="#f2a600"/>
+<text x="991.0" y="356.0" class="t">Security</text>
+<text x="991.0" y="375.0" class="s">sensitive paths only</text>
+<rect x="892" y="115" width="194" height="300" rx="14" fill="none" stroke="#bdbdbd" stroke-dasharray="4 4"/>
+<text x="989" y="107" class="l" text-anchor="middle">judge in parallel, evidence required</text>
+<path d="M1170 210 L1225 265 L1170 320 L1115 265 Z" fill="#fff" stroke="#555" stroke-width="1.5"/>
+<text x="1170" y="262" class="t" style="font-size:13px">all</text><text x="1170" y="279" class="t" style="font-size:13px">approve?</text>
+<rect x="1240" y="70" width="140" height="80" rx="10" fill="#f1fbf2" stroke="#d6d6d6"/>
+<rect x="1240" y="80" width="5" height="60" rx="2.5" fill="#0aac23"/>
+<text x="1312.0" y="98.0" class="t">Approved</text>
+<text x="1312.0" y="117.0" class="s">report · snapshot</text>
+<text x="1312.0" y="133.0" class="s">→ history</text>
+<rect x="1240" y="400" width="140" height="90" rx="10" fill="#fdf2f2" stroke="#d6d6d6"/>
+<rect x="1240" y="410" width="5" height="70" rx="2.5" fill="#dc3c3d"/>
+<text x="1312.0" y="433.0" class="t">Escalate</text>
+<text x="1312.0" y="452.0" class="s">to a person, with</text>
+<text x="1312.0" y="468.0" class="s">proposed slices</text>
+<rect x="694" y="470" width="200" height="70" rx="10" fill="#ffffff" stroke="#d6d6d6"/>
+<rect x="694" y="480" width="5" height="50" rx="2.5" fill="#ee7fac"/>
+<text x="796.0" y="501.0" class="t">Refiner</text>
+<text x="796.0" y="520.0" class="s">Sonnet · fixes at the cause</text>
+<path d="M114 265 H140" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M294 265 H320" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M474 265 H500" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M664 265 H690" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+
+<path d="M584 225 C584 155, 399 155, 399 221" fill="none" stroke="#dc3c3d" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="491" y="165" class="l" text-anchor="middle" style="fill:#dc3c3d">fails: gate fix</text>
+<path d="M854 265 C880 265, 875 170, 900 170" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M1074 170 C1100 170, 1095 265, 1111 265" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M854 265 C880 265, 875 265, 900 265" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M1074 265 C1100 265, 1095 265, 1111 265" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M854 265 C880 265, 875 360, 900 360" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M1074 360 C1100 360, 1095 265, 1111 265" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M1170 210 V110 H1236" fill="none" stroke="#0aac23" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="1180" y="160" class="l" text-anchor="start" style="fill:#0aac23">yes</text>
+<path d="M1225 265 C1245 325, 1310 345, 1310 396" fill="none" stroke="#dc3c3d" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="1322" y="318" class="l" text-anchor="start" style="fill:#dc3c3d">round limit</text><text x="1322" y="334" class="l" text-anchor="start" style="fill:#dc3c3d">or stuck</text>
+<path d="M1170 320 V505 H898" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="1030" y="497" class="l" text-anchor="middle" style="fill:#555">blocking findings</text>
+<path d="M694 505 H584 V309" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="590" y="440" class="l" text-anchor="start" style="fill:#555">next round</text>
+<text x="28" y="44" class="h">One task, round by round</text>
+<text x="28" y="68" class="s" style="text-anchor:start">Round limit 3 (configurable). Nits never block. Every gate and test command runs through heavy.sh.</text>
+</svg>
