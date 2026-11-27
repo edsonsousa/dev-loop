@@ -1,6 +1,6 @@
 {
   "name": "dev-loop",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Agent loop for development tasks: implementer, gate, reviewer and critic, a second implementer, until approved. With a live pane, run history and a retro.",
   "author": { "name": "Edson Sousa" },
   "types": "./types/index.d.ts"
