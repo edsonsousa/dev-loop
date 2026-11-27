@@ -22,6 +22,8 @@ Read `.claude/dev-loop.yml` in the repo root. It holds:
 - `gate`: a list of `{when: <path prefix>, run: <command>}`; run the lines whose prefix the diff touches, from the repo root.
 - `sensitive`: path prefixes or file name patterns that need human review and add the security reviewer.
 - `securityReviewer`: the agent type to call for sensitive paths (omit to skip).
+- `securityFocus`: optional, what the security reviewer covers in this project (e.g. "tenant isolation, auth,
+  secrets"). Default: "authentication, authorization, untrusted input and secrets".
 - `onApproval`: what to do in the project once a run is approved (e.g. a tracker update).
 - `mutation`: optional, a list like `gate`; `{files}` in `run` is replaced by the changed source files under `when`
   (tests excluded), comma-separated, relative to the folder the command `cd`s into.
@@ -29,6 +31,8 @@ Read `.claude/dev-loop.yml` in the repo root. It holds:
   `heavy.sh`.
 - `watch`: optional, the watchdog's limits per agent, `{stallMinutes: 30, repeat: 5, maxToolCalls: 150,
   maxCompactions: 2, maxUsd: 5}`.
+- `weakeningTests`, `weakeningSuppressions`: optional, single-quoted regexes that `weakening.sh` adds to its own
+  test-file and suppression patterns.
 - `roundLimit` (default 3) and `mainBranch` (default `main`).
 
 If the file is missing, stop and offer to write it from the project's CLAUDE.md (its build and test commands, and
@@ -133,7 +137,7 @@ out-of-scope files. In one message, call in parallel:
   previous round's findings with the refiner's `fixed` and `rejected` lists. The reviewer also gets the
   implementer's `criteria` map and the mutation survivors.
 - The `securityReviewer` agent, only if the diff touches a sensitive path, with the same input, the scan output,
-  and: "Cover tenant isolation, auth, vault and secrets; correctness and design belong to two other reviewers.
+  and: "Cover <securityFocus>; correctness and design belong to two other reviewers.
   Every blocking finding needs `evidence`: a command and its output, a failing test, or the quoted lines. A
   blocking finding also names the lower-trust principal and the input it controls, the control that should stop
   it, the trust boundary crossed, and the affected principal or resource with the concrete result; a missing best

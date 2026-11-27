@@ -115,6 +115,8 @@ gate:
 sensitive:
   - src/auth/
 securityReviewer: security-reviewer   # an agent type; omit to skip
+securityFocus: auth, tenant isolation, secrets   # optional; default: authentication, authorization,
+                                                 # untrusted input and secrets
 mutation:                             # optional; survivors on changed lines go to the reviewer
   - when: src/lib/
     run: ~/.local/share/dev-loop/stryker/node_modules/.bin/stryker run --testRunner vitest --reporters clear-text --mutate {files}
@@ -124,6 +126,8 @@ resources:                            # optional, for heavy.sh; defaults shown
   maxGb: 18                           # memory cap per command (default 60% of RAM)
   waitMinutes: 8                      # then give up with exit 75
   timeoutMinutes: 20                  # a command running longer is killed: exit 124, a gate failure
+weakeningTests: '\.it\.lua$'            # optional regexes, added to weakening.sh's own patterns
+weakeningSuppressions: 'luacheck: ignore'
 watch:                                # optional; the watchdog stops an agent past one of these
   stallMinutes: 30                    # no transcript change
   repeat: 5                           # the same tool call in a row
@@ -132,6 +136,23 @@ watch:                                # optional; the watchdog stops an agent pa
   maxUsd: 5
 ```
 
+Gate and mutation lines for common stacks. Every line runs through `heavy.sh`; put the lint and type checks in the
+gate too, so the loop cannot leave them red:
+
+| Stack | `gate` | `mutation` (optional) |
+| --- | --- | --- |
+| TypeScript / JS | `npm test -- --maxWorkers=2`, `npx tsc --noEmit`, `npx eslint .` | Stryker, as above (tested) |
+| Frontend E2E | `npx playwright test --workers=2` | |
+| Java | `mvn -q verify` or `./gradlew check` | PIT (`pitest-maven`), whole module |
+| Kotlin | `./gradlew check` | PIT with the Kotlin plugin, whole module |
+| Python | `pytest -q`, `ruff check .`, `mypy .` | mutmut, configured in `pyproject.toml` |
+| Go | `go test ./...`, `go vet ./...` | |
+| Rust | `cargo test`, `cargo clippy -- -D warnings` | cargo-mutants |
+| C# | `dotnet test` | Stryker.NET (`dotnet stryker`) |
+
+Only the Stryker line replaces `{files}` with the changed files; the others mutate the whole module, which is slower.
+`weakening.sh` knows the test files and the skip and suppression markers of all these stacks, plus Ruby, PHP and
+Swift; add your own with `weakeningTests` and `weakeningSuppressions`.
 
 2. Keep the loop's logs out of git: `.claude/dev-loop/` in `.gitignore` (or `.claude/*` with
    `!.claude/dev-loop.yml`).
